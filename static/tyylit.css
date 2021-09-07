@@ -1,0 +1,9 @@
+fieldset {
+    width: 50%
+}
+
+th, td {
+    font-style: normal;
+    font-size: medium;
+    border: 1px solid black;
+}

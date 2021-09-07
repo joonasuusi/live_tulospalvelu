@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <title>Kesäkisat</title>
+  <link href="static/tyylit.css" rel="stylesheet" />
+</head>
+<body>
+<h1 id="h1">100m tulokset</h1>
+
+<h1>Pituuden tulokset</h1>
+
+<h1>Korkeuden tulokset</h1>
+
+<h1>Kuulan tulokset</h1>
+
+<h1>Kiekon tulokset</h1>
+
+<h1>Keihään tulokset</h1>
+
+<h1 id="final">Lopputulokset</h1>
+  <script>
+    var lopputulokset = [];
+    {% for i in tulokset %}
+    var testi = {{ i | tojson }};
+    {% endfor %}
+    
+    {% for j in pituus %}
+    var pituus = {{ j | tojson }};
+    {% endfor %}
+
+    {% for j in korkeus %}
+    var korkeus = {{ j | tojson }};
+    {% endfor %}
+
+    {% for j in kuula %}
+    var kuula = {{ j | tojson }};
+    {% endfor %}
+
+    {% for j in kiekko %}
+    var kiekko = {{ j | tojson }};
+    {% endfor %}
+
+    {% for j in keihas %}
+    var keihas = {{ j | tojson }};
+    {% endfor %}
+
+
+    let taulu = []
+    for (let i = 0; i < testi.nimi.length; i++) {
+        taulu.push([testi.nimi[i], testi.sijoitus[i]]);
+    }
+
+    if (typeof pituus != "undefined") {
+        var pituustaulu = []
+        for (let i = 0; i < pituus.nimi.length; i++) {
+            pituustaulu.push([pituus.nimi[i], pituus.sijoitus[i]]);
+        }
+    }
+
+    if (typeof korkeus != "undefined") {
+        var korkeustaulu = []
+        for (let i = 0; i < korkeus.nimi.length; i++) {
+            korkeustaulu.push([korkeus.nimi[i], korkeus.sijoitus[i]]);
+        }
+    }
+
+    if (typeof kuula != "undefined") {
+        var kuulataulu = []
+        for (let i = 0; i < kuula.nimi.length; i++) {
+            kuulataulu.push([kuula.nimi[i], kuula.sijoitus[i]]);
+        }
+    }
+
+    if (typeof kiekko != "undefined") {
+        var kiekkotaulu = []
+        for (let i = 0; i < kiekko.nimi.length; i++) {
+            kiekkotaulu.push([kiekko.nimi[i], kiekko.sijoitus[i]]);
+        }
+    }
+
+    if (typeof keihas != "undefined") {
+        var keihastaulu = []
+        for (let i = 0; i < keihas.nimi.length; i++) {
+            keihastaulu.push([keihas.nimi[i], keihas.sijoitus[i]]);
+        }
+    }
+
+    let entry = 0;
+    tulokset(taulu, entry);
+    entry++;
+    tulokset(pituustaulu, entry);
+    entry++;
+    tulokset(korkeustaulu, entry);
+    entry++;
+    tulokset(kuulataulu, entry);
+    entry++;
+    tulokset(kiekkotaulu, entry);
+    entry++;
+    tulokset(keihastaulu, entry);
+
+function tulokset(taulu) {
+    let h1 = document.getElementsByTagName("h1");
+    let table = document.createElement("table");
+    let tr = document.createElement("tr");
+    let th = document.createElement("th");
+    let th1 = document.createElement("th");
+    let th2 = document.createElement("th");
+    h1[entry].appendChild(table);
+    table.appendChild(tr);
+    th.textContent = "Nimi";
+    th1.textContent = "Tulos";
+    th2.textContent = "Pisteet";
+    tr.appendChild(th);
+    tr.appendChild(th1);
+    tr.appendChild(th2);
+    let piste = 0;
+    if (entry == 0) {
+        taulu.sort(compare);
+    }
+    else if (entry > 0 && entry < 3) {
+        taulu.sort(compare_lajit);
+    }
+
+    else {
+        taulu.sort(compare_lajit_float);
+    }
+    for (let i = 0; i < taulu.length; i++) {
+        let tr = document.createElement("tr");
+        let td = document.createElement("td");
+        td.textContent = taulu[i][0];
+        let td1 = document.createElement("td");
+        let td2 = document.createElement("td");
+        td1.textContent = taulu[i][1];
+        
+        if (i > 0 && taulu[i][1] == taulu[i-1][1]) {
+            td2.textContent = piste+1;
+            //piste -= 1;
+        }
+        else {
+            td2.textContent = piste--;
+        }
+        table.appendChild(tr);
+        tr.appendChild(td);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        lopputulokset.push([td.textContent, td2.textContent]);
+    }
+}
+function compare(a,b) {
+    if (parseInt(a[1]) < parseInt(b[1])) {
+        return -1;
+    }
+    if (parseInt(a[1]) > parseInt(b[1])) {
+        return 1;
+    }
+}
+function compare_lajit(a,b) {
+    if (parseInt(a[1]) < parseInt(b[1])) {
+        return 1;
+    }
+    if (parseInt(a[1]) > parseInt(b[1])) {
+        return -1;
+    }
+}
+function compare_lajit_float(a,b) {
+    if (parseFloat(a[1]) < parseFloat(b[1])) {
+        return 1;
+    }
+    if (parseFloat(a[1]) > parseFloat(b[1])) {
+        return -1;
+    }
+}
+//console.log(lopputulokset);
+let tarkistetut_tulokset = []
+let tulos = 0;
+lopputulokset.sort(comp_tulos);
+for (let i = 0; i < lopputulokset.length; i++) {
+    //console.log(lopputulokset[i][0]+" "+lopputulokset[i][1]);
+    tulos = (tulos)+(parseInt(lopputulokset[i][1]));
+    if ((i+1) % 6 == 0) {
+        console.log(lopputulokset[i][0]+" "+tulos)
+        tarkistetut_tulokset.push([lopputulokset[i][0],tulos]);
+        tulos = 0;
+    }
+
+}
+
+function comp_tulos(a,b) {
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+}
+
+let hh1 = document.getElementById("final");
+    let tab = document.createElement("table");
+    let trr = document.createElement("tr");
+    let thh = document.createElement("th");
+    let thh1 = document.createElement("th");
+    let thh2 = document.createElement("th");
+    hh1.appendChild(tab);
+    tab.appendChild(trr);
+    thh.textContent = "Nimi";
+    thh1.textContent = "Sijoitus";
+    thh2.textContent = "Pisteet";
+    
+    trr.appendChild(thh);
+    trr.appendChild(thh1);
+    trr.appendChild(thh2);
+    let sijoitus = 1;
+    tarkistetut_tulokset.sort(tulema);
+for (let i = 0; i < tarkistetut_tulokset.length; i++) {
+    let tr = document.createElement("tr");
+    let td = document.createElement("td");
+    td.textContent = tarkistetut_tulokset[i][0];
+    let td1 = document.createElement("td");
+    let td2 = document.createElement("td");
+    td2.textContent = tarkistetut_tulokset[i][1];
+    if (i > 0 && tarkistetut_tulokset[i-1][1] === tarkistetut_tulokset[i][1]) {
+        td1.textContent = sijoitus-1;
+    }
+    else {
+        td1.textContent = sijoitus++;
+    }
+    tab.appendChild(tr);
+        tr.appendChild(td);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+}
+
+function tulema(a,b) {
+    if (a[1] > b[1]) {
+        return -1;
+    }
+    if (a[1] < b[1]) {
+        return 1;
+    }
+}
+  </script>
+</body>
+</html>

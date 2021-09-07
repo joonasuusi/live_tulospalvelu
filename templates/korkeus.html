@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <title>Kesäkisat</title>
+  <link href="static/tyylit.css" rel="stylesheet" />
+</head>
+<body>
+    <h1>"Livetulokset"</h1>
+    <a href="https://projekti-ua-1.nw.r.appspot.com/100m">100m</a>
+    <a href="https://projekti-ua-1.nw.r.appspot.com/pituus">Pituus</a>
+    <a>Korkeus</a>
+    <a href="https://projekti-ua-1.nw.r.appspot.com/kuula">Kuula</a>
+    <a href="https://projekti-ua-1.nw.r.appspot.com/kiekko">Kiekko</a>
+    <a href="https://projekti-ua-1.nw.r.appspot.com/keihas">Keihäs</a>
+    
+    <form action="{{request.base_url}}">
+        <fieldset>
+            <h2>Korkeus</h2>
+            {% for i in nimet %}
+            <p>
+                <label>{{ i["nimi"] }}<input type="number"/></label>
+            </p>
+            {% endfor %}
+        </fieldset>
+        <button onclick="paivita()">Päivitä</button>
+    </form>
+    <p><a href="https://projekti-ua-1.nw.r.appspot.com/">Takaisin</a></p>
+  <script>
+ 
+
+    function paivita(e) {
+        var tulokset = document.getElementsByTagName("input");
+        var osallistujat = document.getElementsByTagName("label");
+        let data = {
+            "nimi": [],
+            "sijoitus": []
+        }; 
+        let req = new XMLHttpRequest();
+        req.open('POST', '/savekorkeus', true);
+        req.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        for (let i = 0; i < tulokset.length; i++) {
+            data.nimi.push(osallistujat[i].textContent);
+            data.sijoitus.push(tulokset[i].value);
+        }             
+        req.send(JSON.stringify(data));  
+
+    }
+  </script>
+</body>
+</html>
